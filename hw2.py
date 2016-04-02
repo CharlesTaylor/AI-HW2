@@ -74,19 +74,28 @@ def PossibleMoves(puzzle):
 		tmp[row*3+col+1] = -1
 		al.append(list(tmp))
 	return al
+def ToString(puzzle):
+	return str(puzzle)
 def BeamItUp(puzzle, w):
 	
 	l = []
 	ll = []
 	ll.append(puzzle)
 	count = 0
+	dic = {}
+	dic[ToString(puzzle)] = 1
 	while(Manhattan(ll[0]) is not 0 and count < 1000):
 		l = []
 		for i in range(w):
 			if i >= len(ll):
 				break
-			tmp = ll[i]
-			l.extend(PossibleMoves(ll[i]))
+			moves = PossibleMoves(ll[i])
+			dic[ToString(ll[i])] = 1
+			for pz in moves:
+				if ToString(pz) not in dic:
+					l.append(pz)
+
+			#l.extend()
 		ll = []
 		ll.extend(l)
 			
