@@ -3,8 +3,9 @@ from random import shuffle
 
 def Manhattan(puzzle):
 	distance = 0
-	for i in range(len(lis)):
-		if(lis[i] is not -1):
+	for i in range(len(puzzle)):
+		if(puzzle[i] is not -1):
+			#print puzzle[i] , "------"
 			distance = distance + abs(puzzle[i] % 3 - i % 3) + abs(puzzle[i] / 3 - i /3)
 
 	return distance
@@ -26,12 +27,32 @@ def PuzzleGenerator():
 	else:#Solvable so return
 		return lis
 
+def cmp_to_key(mycmp):
+    'Convert a cmp= function into a key= function'
+    class K(object):
+        def __init__(self, obj, *args):
+            self.obj = obj
+        def __lt__(self, other):
+            return mycmp(self.obj, other.obj) < 0
+        def __gt__(self, other):
+            return mycmp(self.obj, other.obj) > 0
+        def __eq__(self, other):
+            return mycmp(self.obj, other.obj) == 0
+        def __le__(self, other):
+            return mycmp(self.obj, other.obj) <= 0  
+        def __ge__(self, other):
+            return mycmp(self.obj, other.obj) >= 0
+        def __ne__(self, other):
+            return mycmp(self.obj, other.obj) != 0
+    return K
+def CmpPuzzle(p1,p2):
+	return Manhattan(p1) - Manhattan(p2)
 def PossibleMoves(puzzle):
 	al = []
 	empty = puzzle.index(-1);
 	row = empty /3
 	col = empty %3
-	print (str(row)+	"-"+str(col))
+	#print (str(row)+	"-"+str(col))
 	tmp = list(puzzle)
 	if row  > 0:
 		tmp[empty] = tmp[(row -1)*3+col]
@@ -58,21 +79,32 @@ def BeamItUp(puzzle, w):
 	l = []
 	ll = []
 	ll.append(puzzle)
+	count = 0
+	while(Manhattan(ll[0]) is not 0 and count < 1000):
+		l = []
+		for i in range(w):
+			if i >= len(ll):
+				break
+			tmp = ll[i]
+			l.extend(PossibleMoves(ll[i]))
+		ll = []
+		ll.extend(l)
+			
+		ll = sorted(ll, key= cmp_to_key(CmpPuzzle))
+		print ll
+		ll = ll[0:w]
+		count = count + 1
 	
-	empty = puzzle.index(-1);
-	row = puzzle[empty] /3
-	col = puzzle[empty] %3
 	
-	print empty
 
 
 
 def main():
 	l = PuzzleGenerator()
-	print l
-	print PossibleMoves(l)
-	BeamItUp(l,3)
-
-
+	#print l
+	#print PossibleMoves(l)
+	BeamItUp(l,4)
+	
+	
 
 main()
