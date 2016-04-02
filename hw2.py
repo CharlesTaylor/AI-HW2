@@ -1,6 +1,14 @@
 
 from random import shuffle
 
+def SetDif(puzzle):
+	count = 0
+	for i in xrange(len(puzzle)):
+		if(puzzle[i] is not -1):
+			if(puzzle[i] is not i):
+				count = count +1
+	return count
+
 def Manhattan(puzzle):
 	distance = 0
 	for i in range(len(puzzle)):
@@ -45,8 +53,10 @@ def cmp_to_key(mycmp):
         def __ne__(self, other):
             return mycmp(self.obj, other.obj) != 0
     return K
-def CmpPuzzle(p1,p2):
+def CmpPuzzle2(p1,p2):#My Hurustic works better
 	return Manhattan(p1) - Manhattan(p2)
+def CmpPuzzle(p1,p2):#Bad Hurustic of HW
+	return SetDif(p1) - SetDif(p2)
 def PossibleMoves(puzzle):
 	al = []
 	empty = puzzle.index(-1);
