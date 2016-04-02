@@ -84,35 +84,52 @@ def BeamItUp(puzzle, w):
 	count = 0
 	dic = {}
 	dic[ToString(puzzle)] = 1
-	while(Manhattan(ll[0]) is not 0 and count < 1000):
-		l = []
-		for i in range(w):
-			if i >= len(ll):
-				break
-			moves = PossibleMoves(ll[i])
-			dic[ToString(ll[i])] = 1
-			for pz in moves:
-				if ToString(pz) not in dic:
-					l.append(pz)
+	try:
+		while(Manhattan(ll[0]) is not 0 and count < 1000):
+			l = []
+			for i in range(w):
+				if i >= len(ll):
+					break
+				moves = PossibleMoves(ll[i])
+				dic[ToString(ll[i])] = 1
+				for pz in moves:
+					if ToString(pz) not in dic:
+						l.append(pz)
 
-			#l.extend()
-		ll = []
-		ll.extend(l)
+				#l.extend()
+			ll = []
+			ll.extend(l)
+				
+			ll = sorted(ll, key= cmp_to_key(CmpPuzzle))
+			#print ll
+			ll = ll[0:w]
+			count = count + 1
+			#if(len(ll) is 0):
+			#	print "Failed: ",puzzle
+			#	break
+	except IndexError:
+		print "Failed: ",puzzle
 			
-		ll = sorted(ll, key= cmp_to_key(CmpPuzzle))
-		print ll
-		ll = ll[0:w]
-		count = count + 1
-	
-	
-
 
 
 def main():
 	l = PuzzleGenerator()
+	count = 0
+	puzzles = {}
+	while count < 1000:
+		l = PuzzleGenerator()
+		if ToString(l) not in puzzles:
+			puzzles[ToString(l)] = l
+			count = count + 1
+	#puzzles = puzzles.items()
+	puzzles =[v for k,v in puzzles.items()]
+	for p in puzzles:
+		for w in xrange(2,5):
+			#print p
+			BeamItUp(p,w)
 	#print l
 	#print PossibleMoves(l)
-	BeamItUp(l,4)
+	#BeamItUp(l,4)
 	
 	
 
