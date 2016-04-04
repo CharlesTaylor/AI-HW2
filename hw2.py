@@ -1,6 +1,7 @@
 
 from random import shuffle
 
+#Heuristic asked in HW2, Counts number of puzzle parts that are not in their place
 def SetDif(puzzle):
 	count = 0
 	for i in xrange(len(puzzle)):
@@ -8,7 +9,7 @@ def SetDif(puzzle):
 			if(puzzle[i] is not i):
 				count = count +1
 	return count
-
+#A better heuristic which sums up total manhattan distance of all parts to their actual place
 def Manhattan(puzzle):
 	distance = 0
 	for i in range(len(puzzle)):
@@ -18,6 +19,7 @@ def Manhattan(puzzle):
 
 	return distance
 
+#Generates Puzzles first creates alist -1 to 7 then shuffles it if it is solveable return else try again
 def PuzzleGenerator():
 	lis = [-1,0,1,2,3,4,5,6,7]#Repsresents value+1
 	shuffle(lis)
@@ -35,6 +37,7 @@ def PuzzleGenerator():
 	else:#Solvable so return
 		return lis
 
+#A function that converts comparator to Key object
 def cmp_to_key(mycmp):
     'Convert a cmp= function into a key= function'
     class K(object):
@@ -53,10 +56,16 @@ def cmp_to_key(mycmp):
         def __ne__(self, other):
             return mycmp(self.obj, other.obj) != 0
     return K
+
+#A comparator that uses Manhattan Heuristic
 def CmpPuzzle2(p1,p2):#My Hurustic works better
 	return Manhattan(p1) - Manhattan(p2)
+
+#A comparator that uses SetDif Heuristic
 def CmpPuzzle(p1,p2):#Bad Hurustic of HW
 	return SetDif(p1) - SetDif(p2)
+
+#Generates A list of Possible Moves From a game state
 def PossibleMoves(puzzle):
 	al = []
 	empty = puzzle.index(-1);
@@ -69,7 +78,7 @@ def PossibleMoves(puzzle):
 		tmp[(row -1)*3+col] = -1
 		al.append(list(tmp))
 	tmp = list(puzzle)
-	if row +1 < 3:
+	if row  < 2:
 		tmp[empty] = tmp[(row +1)*3+col]
 		tmp[(row +1)*3+col] = -1
 		al.append(list(tmp))
@@ -79,68 +88,67 @@ def PossibleMoves(puzzle):
 		tmp[row*3+col-1] = -1
 		al.append(list(tmp))
 	tmp = list(puzzle)
-	if col + 1 < 3:
+	if col < 2:
 		tmp[empty] = tmp[row*3+col+1]
 		tmp[row*3+col+1] = -1
 		al.append(list(tmp))
 	return al
+#A toString method, which can be changed later on to represent Puzzles
 def ToString(puzzle):
 	return str(puzzle)
+
+#Beam Search Method
 def BeamItUp(puzzle, w):
 	
-	l = []
-	ll = []
-	ll.append(puzzle)
-	count = 0
-	dic = {}
+	l = []#Temp List to keep new puzzles
+	ll = []#A list to keep puzzles
+	ll.append(puzzle)#begin
+	count = 0#counter, Probably not necessary anymore
+	dic = {}#A dictionary to keep track of visited states to prevent looping
 	dic[ToString(puzzle)] = 1
-	try:
-		while(Manhattan(ll[0]) is not 0 and count < 1000):
-			l = []
+	try:#A try catch mechanism to detect index errors, This happens when ll is empty, so search failed
+		while(Manhattan(ll[0]) is not 0 and count < 1000):#Loop until finish puzzle
+			l = []#empty temp list
 			for i in range(w):
-				if i >= len(ll):
+				if i >= len(ll):#This looks stupid atm, I dont know what I thought, I could change for loop :P
 					break
-				moves = PossibleMoves(ll[i])
-				dic[ToString(ll[i])] = 1
-				for pz in moves:
+				moves = PossibleMoves(ll[i])#Get Possible moves
+				dic[ToString(ll[i])] = 1#Add current state to dictionary
+				for pz in moves:#Check if new moves are in the dictionary, else add to l
 					if ToString(pz) not in dic:
 						l.append(pz)
 
 				#l.extend()
-			ll = []
-			ll.extend(l)
+			ll = []#Reset the ll, since we expanded all w
+			ll.extend(l)# Append l to ll
 				
-			ll = sorted(ll, key= cmp_to_key(CmpPuzzle))
+			ll = sorted(ll, key= cmp_to_key(CmpPuzzle))#Sort ll according to chosen Heuristic
 			#print ll
-			ll = ll[0:w]
-			count = count + 1
-			#if(len(ll) is 0):
-			#	print "Failed: ",puzzle
-			#	break
+			ll = ll[0:w]#Remove states except first w
+			count = count + 1#increment counter
+			
 	except IndexError:
 		print "Failed: ",puzzle
 			
 
-
+#Main Function
 def main():
-	l = PuzzleGenerator()
-	count = 0
-	puzzles = {}
-	while count < 1000:
-		l = PuzzleGenerator()
-		if ToString(l) not in puzzles:
-			puzzles[ToString(l)] = l
-			count = count + 1
+
+	count = 0#Counter to keep track of number of puzzles to solve
+	puzzles = {}#Dictionary to be sure that all puzzles are distinct
+	while count < 1000:#1000 puzzles asked in hw
+		l = PuzzleGenerator()#Generate a puzzle
+		if ToString(l) not in puzzles:#if not in dictionary
+			puzzles[ToString(l)] = l#Added it to dictionary
+			count = count + 1#increment
 	#puzzles = puzzles.items()
-	puzzles =[v for k,v in puzzles.items()]
-	for p in puzzles:
-		for w in xrange(2,5):
+	puzzles =[v for k,v in puzzles.items()]#convert dictionary to a list to iterate
+	for p in puzzles:#for each puzzle
+		for w in xrange(2,5):#for each omega
 			#print p
-			BeamItUp(p,w)
-	#print l
-	#print PossibleMoves(l)
-	#BeamItUp(l,4)
+			BeamItUp(p,w)#BeamSearch
+	
 	
 	
 
-main()
+main()#Call Main
