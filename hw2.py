@@ -123,32 +123,40 @@ def BeamItUp(puzzle, w):
 			ll.extend(l)# Append l to ll
 				
 			ll = sorted(ll, key= cmp_to_key(CmpPuzzle))#Sort ll according to chosen Heuristic
+			
 			#print ll
 			ll = ll[0:w]#Remove states except first w
+			print ll
 			count = count + 1#increment counter
 			
 	except IndexError:
-		print "Failed: ",puzzle
-			
+		#print "Failed: ",puzzle
+		return False
+	return True
 
 #Main Function
 def main():
 
 	count = 0#Counter to keep track of number of puzzles to solve
 	puzzles = {}#Dictionary to be sure that all puzzles are distinct
-	while count < 1000:#1000 puzzles asked in hw
+	while count < 500:#1000 puzzles asked in hw
 		l = PuzzleGenerator()#Generate a puzzle
 		if ToString(l) not in puzzles:#if not in dictionary
 			puzzles[ToString(l)] = l#Added it to dictionary
 			count = count + 1#increment
 	#puzzles = puzzles.items()
 	puzzles =[v for k,v in puzzles.items()]#convert dictionary to a list to iterate
+	l = [0,0,0,0]
 	for p in puzzles:#for each puzzle
-		for w in xrange(2,5):#for each omega
+		for w in xrange(1,5):#for each omega
 			#print p
-			BeamItUp(p,w)#BeamSearch
+			if BeamItUp(p,w):#BeamSearch
+				l[w-1] = l[w-1] + 1
 	
 	
-	
-
-main()#Call Main
+	print l
+def main2():
+	l = PuzzleGenerator()
+	print l
+	BeamItUp(l,3)
+main2()#Call Main
